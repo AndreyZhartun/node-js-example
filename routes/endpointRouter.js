@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 
 const endpointRouter = express.Router();
 
-endpointRouter.use(bodyParser);
+endpointRouter.use(bodyParser.urlencoded({ extended: false }));
+endpointRouter.use(bodyParser.json());
 
 endpointRouter.route('/')
     .all((req, res, next) => {

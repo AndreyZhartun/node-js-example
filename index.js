@@ -10,6 +10,7 @@ const port = 3000;
 const app = express();
 
 app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/endpoints', endpointRouter);
