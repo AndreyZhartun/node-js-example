@@ -6,7 +6,18 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const endpointRouter = require('./routes/endpointRouter');
+const itemsRouter = require('./routes/itemsRouter');
+
+const mongoose = require('mongoose');
+
+const Items = require('./models/items');
+
+const url = 'mongodb://localhost:27017/localhost_db';
+const connect = mongoose.connect(url);
+
+connect.then((db) => {
+  console.log("Connected correctly to server");
+}, (err) => { console.log(err); });
 
 var app = express();
 
@@ -22,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/endpoints', endpointRouter);
+app.use('/items', itemsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
