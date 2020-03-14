@@ -1,15 +1,15 @@
 const express = require('express');
+const router = express.Router();
+
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const Items = require('../models/items')
 
-const itemsRouter = express.Router();
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json());
 
-itemsRouter.use(bodyParser.urlencoded({ extended: false }));
-itemsRouter.use(bodyParser.json());
-
-itemsRouter.route('/')
+router.route('/')
     .get((req, res, next) => {
         Items.find({})
             .then((items) => {
@@ -46,7 +46,7 @@ itemsRouter.route('/')
             .catch((err) => next(err));
     });
 
-itemsRouter.route('/:itemId')
+router.route('/:itemId')
     .get((req, res, next) => {
         Items.findById(req.params.itemId)
             .then((item) => {
@@ -87,7 +87,7 @@ itemsRouter.route('/:itemId')
             .catch((err) => next(err));
     });
 
-itemRouter.route('/:itemId/comments')
+router.route('/:itemId/comments')
     .get((req,res,next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
@@ -152,7 +152,7 @@ itemRouter.route('/:itemId/comments')
         .catch((err) => next(err));    
     });
 
-itemRouter.route('/:itemId/comments/:commentId')
+router.route('/:itemId/comments/:commentId')
     .get((req,res,next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
@@ -235,4 +235,4 @@ itemRouter.route('/:itemId/comments/:commentId')
         .catch((err) => next(err));
     });
 
-module.exports = itemsRouter;
+module.exports = router;

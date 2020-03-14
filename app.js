@@ -6,9 +6,11 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const itemsRouter = require('./routes/itemsRouter');
+var itemsRouter = require('./routes/itemsRouter');
 
-const mongoose = require('mongoose');
+var mongoose = require('mongoose');
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 const Items = require('./models/items');
 
@@ -28,11 +30,44 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(cookieParser('very-secret-code'));
+
+app.use(session({
+  name: 'session-test',
+  secret: 'very-secret-code',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+function auth (req, res, next) {
+  console.log(req.session);
+
+if(!req.session.user) {
+    var err = new Error('You are not authenticated!');
+    err.status = 403;
+    return next(err);
+}
+else {
+  if (req.session.user === 'authenticated') {
+    next();
+  }
+  else {
+    var err = new Error('You are not authenticated!');
+    err.status = 403;
+    return next(err);
+  }
+}
+}
+
+app.use(auth);
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 app.use('/items', itemsRouter);
 
 // catch 404 and forward to error handler
