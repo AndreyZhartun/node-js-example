@@ -3,6 +3,7 @@ const router = express.Router();
 
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+var authenticate = require('../authenticate');
 
 const Items = require('../models/items')
 
@@ -20,7 +21,7 @@ router.route('/')
             .catch((err) => next(err));
     })
   
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Items.create(req.body)
             .then((item) => {
                 console.log('Item Created ', item);
@@ -31,12 +32,12 @@ router.route('/')
             .catch((err) => next(err));
     })
   
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('PUT not supported on /items');
     })
   
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Items.remove({})
             .then((resp) => {
                 res.statusCode = 200;
@@ -57,12 +58,12 @@ router.route('/:itemId')
             .catch((err) => next(err));
     })
       
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('POST not supported on /items/' + req.params.itemId);
     })
       
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         Items.findByIdAndUpdate(req.params.itemId, { 
             $set: req.body 
         },
@@ -77,7 +78,7 @@ router.route('/:itemId')
             .catch((err) => next(err));
     })
       
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Items.findByIdAndRemove(req.params.itemId)
             .then((resp) => {
                 res.statusCode = 200;
@@ -104,7 +105,7 @@ router.route('/:itemId/comments')
         }, (err) => next(err))
         .catch((err) => next(err));
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
             if (item != null) {
@@ -124,12 +125,12 @@ router.route('/:itemId/comments')
         }, (err) => next(err))
         .catch((err) => next(err));
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('PUT operation not supported on /items/'
             + req.params.itemId + '/comments');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
             if (item != null) {
@@ -174,12 +175,12 @@ router.route('/:itemId/comments/:commentId')
         }, (err) => next(err))
         .catch((err) => next(err));
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on /items/'+ req.params.itemId
             + '/comments/' + req.params.commentId);
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
             if (item != null && item.comments.id(req.params.commentId) != null) {
@@ -209,7 +210,7 @@ router.route('/:itemId/comments/:commentId')
         }, (err) => next(err))
         .catch((err) => next(err));
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
             if (item != null && item.comments.id(req.params.commentId) != null) {
