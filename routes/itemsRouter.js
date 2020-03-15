@@ -189,7 +189,7 @@ router.route('/:itemId/comments/:commentId')
         res.end('POST operation not supported on /items/'+ req.params.itemId
             + '/comments/' + req.params.commentId);
     })
-    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    .put(/*cors.corsWithOptions, */authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
@@ -223,7 +223,7 @@ router.route('/:itemId/comments/:commentId')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    .delete(/*cors.corsWithOptions, */authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
