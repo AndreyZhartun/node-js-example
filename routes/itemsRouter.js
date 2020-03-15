@@ -3,7 +3,8 @@ const router = express.Router();
 
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-var authenticate = require('../authenticate');
+const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const Items = require('../models/items')
 
@@ -11,7 +12,10 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 router.route('/')
-    .get((req, res, next) => {
+    //HTTP OPTIONS
+    .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+    //HTTP GET
+    .get(cors.cors, (req, res, next) => {
         Items.find({})
             .populate('comments.author')
             .then((items) => {
@@ -21,8 +25,8 @@ router.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-  
-    .post(authenticate.verifyUser, (req, res, next) => {
+    //HTTP POST
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Items.create(req.body)
             .then((item) => {
                 console.log('Item Created ', item);
@@ -32,13 +36,13 @@ router.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-  
-    .put(authenticate.verifyUser, (req, res, next) => {
+    //HTTP PUT
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('PUT not supported on /items');
     })
-  
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    //HTTP DELETE
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Items.remove({})
             .then((resp) => {
                 res.statusCode = 200;
@@ -49,7 +53,8 @@ router.route('/')
     });
 
 router.route('/:itemId')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+    .get(cors.cors, (req, res, next) => {
         Items.findById(req.params.itemId)
             .populate('comments.author')
             .then((item) => {
@@ -60,12 +65,12 @@ router.route('/:itemId')
             .catch((err) => next(err));
     })
       
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('POST not supported on /items/' + req.params.itemId);
     })
       
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Items.findByIdAndUpdate(req.params.itemId, { 
             $set: req.body 
         },
@@ -80,7 +85,7 @@ router.route('/:itemId')
             .catch((err) => next(err));
     })
       
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Items.findByIdAndRemove(req.params.itemId)
             .then((resp) => {
                 res.statusCode = 200;
@@ -91,7 +96,8 @@ router.route('/:itemId')
     });
 
 router.route('/:itemId/comments')
-    .get((req,res,next) => {
+    .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+    .get(cors.cors, (req,res,next) => {
         Items.findById(req.params.itemId)
             .populate('comments.author')
             .then((item) => {
@@ -108,7 +114,7 @@ router.route('/:itemId/comments')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
         .then((dish) => {
             if (dish != null) {
@@ -133,12 +139,12 @@ router.route('/:itemId/comments')
         }, (err) => next(err))
         .catch((err) => next(err));
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('PUT operation not supported on /items/'
             + req.params.itemId + '/comments');
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Items.findById(req.params.itemId)
         .then((item) => {
             if (item != null) {
@@ -162,7 +168,8 @@ router.route('/:itemId/comments')
     });
 
 router.route('/:itemId/comments/:commentId')
-    .get((req,res,next) => {
+    .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+    .get(cors.cors, (req,res,next) => {
         Items.findById(req.params.itemId)
             .populate('comments.author')
             .then((item) => {
@@ -184,12 +191,12 @@ router.route('/:itemId/comments/:commentId')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on /items/'+ req.params.itemId
             + '/comments/' + req.params.commentId);
     })
-    .put(/*cors.corsWithOptions, */authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
@@ -223,7 +230,7 @@ router.route('/:itemId/comments/:commentId')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .delete(/*cors.corsWithOptions, */authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
