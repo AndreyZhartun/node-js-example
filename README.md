@@ -6,7 +6,7 @@
 * Аутентификация пользователей: с помощью JSON Web Token;
 * Подключение и настройка работы с NoSQL базой данных MongoDB (с использованием Mongoose ODM, Mongoose Population);
 * Имплементация SSL с самоподписанный ключом (в качестве примера), базовая реализация CORS.
-//
+
 # Simple RESTful backend example on Node.js (using Express, MongoDB)
 
 This is a simple implementation of RESTful backend supporting CRUD (create, read, update, delete) operations on Node.js. It was put here to provide a proof of my backend bulding abilities as part of my job seeking process.
